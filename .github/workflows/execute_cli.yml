@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+name: TestRail CLI Integration
+
+jobs:
+
+  cli:
+    name: TestRail CLI Integration
+    runs-on: ubuntu-latest
+    env:
+      WORKING_DIR: ./
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: '3.x'
+      - name: Execute TestRail CLI to upload results
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          pip install trcli
+          trcli -y \
+            -h ${{ secrets.TESTRAIL_URL }} \
+            --project "${{ secrets.PROJECT_NAME }}" \
+            -u ${{ secrets.TESTRAIL_USER }} \
+            -p "${{ secrets.TESTRAIL_USER_PW }}" \
+            parse_junit \
+            -f "generated_results/test_suite.xml" \
+            --title "Playwright GenAI Demo Tests" \
+            --run-description "GitHub workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
