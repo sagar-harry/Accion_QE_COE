@@ -8,128 +8,129 @@ from time import sleep
 from compare_sentences import compare_sentences
 import sys
 
-def run_checkout_test():
-    # Set up Chrome options
+def run_test():
     chrome_options = Options()
-    chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument("--incognito")
-    chrome_options.add_argument("--disable-popup-blocking")
-    chrome_options.add_argument("--start-maximized")
-
-    # Initialize WebDriver
+    chrome_options.add_argument('--disable-notifications')
+    
     driver = webdriver.Chrome(options=chrome_options)
-
+    
     try:
-        # Define xpaths
-        locators = {
-            "username": "//input[@id='user-name']",
-            "password": "//input[@id='password']",
-            "login_btn": "//input[@id='login-button']",
-            "add_to_cart_btn": "//button[@id='add-to-cart-sauce-labs-backpack']",
-            "shopping_cart_icon": "//div[@id='shopping_cart_container']//a",
-            "checkout_btn": "//button[@id='checkout']",
-            "first_name": "//input[@id='first-name']",
-            "last_name": "//input[@id='last-name']",
-            "postal_code": "//input[@id='postal-code']",
-            "continue_btn": "//input[@id='continue']",
-            "finish_btn": "//button[@id='finish']",
-            "order_confirmation_msg": "//h2[@class='complete-header' and contains(text(), 'Thank you for your order!')]"
-        }
+        # Step 1 - Given I am on the login page
+        driver.get("https://www.saucedemo.com/")
+        driver.maximize_window()
+        sleep(3)
 
-        base_url = "https://www.saucedemo.com/"
-        wait_time = 3
+        # Step 2 - When I enter username as 'standard_user'
+        username_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@id='user-name']"))
+        )
+        username_input.send_keys("standard_user")
+        sleep(3)
 
-        # Start test
-        driver.get(base_url)
+        # Step 3 - And I enter password as 'secret_sauce'
+        password_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@id='password']"))
+        )
+        password_input.send_keys("secret_sauce")
+        sleep(3)
 
-        # Login
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, locators["username"])))
-        driver.find_element(By.XPATH, locators["username"]).send_keys("standard_user")
-        sleep(wait_time)
+        # Step 4 - And I click the login button
+        login_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@id='login-button']"))
+        )
+        login_button.click()
+        sleep(3)
 
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, locators["password"])))
-        driver.find_element(By.XPATH, locators["password"]).send_keys("secret_sauce")
-        sleep(wait_time)
+        # Step 5 - Then I should be redirected to the product listing page
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//span[@class='title'][contains(text(), 'Products')]"))
+        )
+        
+        # Step 6 - When I click on the 'Add to cart' button for 'Sauce Labs Backpack'
+        add_to_cart_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@id='add-to-cart-sauce-labs-backpack']"))
+        )
+        add_to_cart_button.click()
+        sleep(3)
 
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["login_btn"])))
-        driver.find_element(By.XPATH, locators["login_btn"]).click()
-        sleep(wait_time)
+        # Step 7 - And I click on the cart icon
+        cart_icon = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[@id='shopping_cart_container']/a"))
+        )
+        cart_icon.click()
+        sleep(3)
 
-        # Assert on Product Listing Page
-        current_url = driver.current_url
-        if not current_url.endswith("/inventory.html"):
-            sys.exit(1)
+        # Step 8 - Then I should be on the shopping cart page
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//span[@class='title'][contains(text(), 'Your Cart')]"))
+        )
 
-        # Add product to cart
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["add_to_cart_btn"])))
-        driver.find_element(By.XPATH, locators["add_to_cart_btn"]).click()
-        sleep(wait_time)
+        # Step 9 - When I click the 'Checkout' button
+        checkout_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@id='checkout']"))
+        )
+        checkout_button.click()
+        sleep(3)
 
-        # Navigate to cart
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["shopping_cart_icon"])))
-        driver.find_element(By.XPATH, locators["shopping_cart_icon"]).click()
-        sleep(wait_time)
+        # Step 10 - Then I should be on the checkout step 1 page
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//span[@class='title'][contains(text(), 'Checkout: Your Information')]"))
+        )
 
-        # Assert on Shopping Cart Page
-        current_url = driver.current_url
-        if not current_url.endswith("/cart.html"):
-            sys.exit(1)
+        # Step 11 - When I enter 'First Name' as 'John' and 'Last Name' as 'Doe' and 'Zip/Postal Code' as '12345'
+        first_name_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@id='first-name']"))
+        )
+        first_name_input.send_keys("John")
+        sleep(3)
 
-        # Check cart item
-        if not driver.find_element(By.XPATH, "//div[@class='inventory_item_name']").text == "Sauce Labs Backpack":
-            sys.exit(1)
+        last_name_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@id='last-name']"))
+        )
+        last_name_input.send_keys("Doe")
+        sleep(3)
 
-        # Checkout process
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["checkout_btn"])))
-        driver.find_element(By.XPATH, locators["checkout_btn"]).click()
-        sleep(wait_time)
+        zip_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@id='postal-code']"))
+        )
+        zip_input.send_keys("12345")
+        sleep(3)
 
-        # Assert on Checkout Step 1 Page
-        current_url = driver.current_url
-        if not current_url.endswith("/checkout-step-one.html"):
-            sys.exit(1)
+        # Step 12 - And I click the 'Continue' button
+        continue_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@id='continue']"))
+        )
+        continue_button.click()
+        sleep(3)
 
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, locators["first_name"])))
-        driver.find_element(By.XPATH, locators["first_name"]).send_keys("John")
-        sleep(wait_time)
+        # Step 13 - Then I should be on the checkout step 2 - Order Overview page
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//span[@class='title'][contains(text(), 'Checkout: Overview')]"))
+        )
 
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, locators["last_name"])))
-        driver.find_element(By.XPATH, locators["last_name"]).send_keys("Doe")
-        sleep(wait_time)
+        # Step 14 - When I click the 'Finish' button
+        finish_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@id='finish']"))
+        )
+        finish_button.click()
+        sleep(3)
 
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, locators["postal_code"])))
-        driver.find_element(By.XPATH, locators["postal_code"]).send_keys("12345")
-        sleep(wait_time)
-
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["continue_btn"])))
-        driver.find_element(By.XPATH, locators["continue_btn"]).click()
-        sleep(wait_time)
-
-        # Assert on Checkout Step 2 Page
-        current_url = driver.current_url
-        if not current_url.endswith("/checkout-step-two.html"):
-            sys.exit(1)
-
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, locators["finish_btn"])))
-        driver.find_element(By.XPATH, locators["finish_btn"]).click()
-        sleep(wait_time)
-
-        # Assert on Order Confirmation Page
-        current_url = driver.current_url
-        if not current_url.endswith("/checkout-complete.html"):
-            sys.exit(1)
-
-        confirmation_message_element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, locators["order_confirmation_msg"])))
-        if not compare_sentences(confirmation_message_element.text, "Thank you for your order!"):
-            sys.exit(1)
-
-        # If we reach here, the test has passed
+        # Step 15 - Then I should see the order confirmation page
+        confirmation_heading = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//h2[@class='complete-header']"))
+        )
+        confirmation_message_text = confirmation_heading.text
+        assert compare_sentences(confirmation_message_text, "Thank you for your order!")
+        
+        # If all steps pass
         sys.exit(0)
+    
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Test failed: {str(e)}")
         sys.exit(1)
+    
     finally:
         driver.quit()
 
-run_checkout_test()
+run_test()

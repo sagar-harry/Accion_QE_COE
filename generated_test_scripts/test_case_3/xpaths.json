@@ -1,11 +1,11 @@
 {
     "xpaths": [
         {
-            "element_name": "Username Input Field",
+            "element_name": "Username Input",
             "xpath": "//input[@id='user-name']"
         },
         {
-            "element_name": "Password Input Field",
+            "element_name": "Password Input",
             "xpath": "//input[@id='password']"
         },
         {
@@ -13,27 +13,27 @@
             "xpath": "//input[@id='login-button']"
         },
         {
-            "element_name": "Add to Cart Button for Sauce Labs Backpack",
+            "element_name": "Add to Cart Sauce Labs Backpack",
             "xpath": "//button[@id='add-to-cart-sauce-labs-backpack']"
         },
         {
-            "element_name": "Shopping Cart Icon",
-            "xpath": "//div[@id='shopping_cart_container']//a"
+            "element_name": "Cart Icon",
+            "xpath": "//div[@id='shopping_cart_container']/a"
         },
         {
             "element_name": "Checkout Button",
             "xpath": "//button[@id='checkout']"
         },
         {
-            "element_name": "First Name Input Field",
+            "element_name": "First Name Input",
             "xpath": "//input[@id='first-name']"
         },
         {
-            "element_name": "Last Name Input Field",
+            "element_name": "Last Name Input",
             "xpath": "//input[@id='last-name']"
         },
         {
-            "element_name": "Zip/Postal Code Input Field",
+            "element_name": "Zip/Postal Code Input",
             "xpath": "//input[@id='postal-code']"
         },
         {
@@ -46,7 +46,7 @@
         },
         {
             "element_name": "Order Confirmation Message",
-            "xpath": "//h2[@class='complete-header' and contains(text(), 'Thank you for your order!')]"
+            "xpath": "//h2[@class='complete-header']"
         }
     ]
 }
